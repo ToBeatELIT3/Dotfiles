@@ -2,11 +2,11 @@ syntax on
 filetype on
 
 set number
+set laststatus=2
 set noshowmode
 set autoindent
 set noswapfile
 set nomodeline
-set laststatus=2
 set shiftwidth=4
 set background=dark
 set incsearch
@@ -15,12 +15,10 @@ set shell=/usr/bin/fish
 call plug#begin('~/.vim/plugged')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-":CocInstall coc-git coc-pairs coc-json coc-css coc-html coc-tsserver
-"coc-python coc-clangd
-Plug 'itchyny/lightline.vim'
 Plug 'arcticicestudio/nord-vim'
 Plug 'preservim/nerdtree'
 Plug 'dense-analysis/ale'
+Plug 'itchyny/lightline.vim'
 
 call plug#end()
 
@@ -35,15 +33,20 @@ nnoremap <C-H> <C-W><C-H>
 
 inoremap jj <Esc>
 tnoremap jj <C-\><C-n>
+
 map <C-n> :NERDTreeToggle<CR>
 
 autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-
 let g:lightline = {
       \ 'colorscheme': 'nord',
       \ }
+
+let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
+let s:palette.normal.middle = [ [ 'NONE', 'NONE', 'NONE', 'NONE' ] ]
+let s:palette.inactive.middle = s:palette.normal.middle
+let s:palette.tabline.middle = s:palette.normal.middle
 
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
@@ -61,4 +64,15 @@ if has('nvim')
 else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
+
+augroup filetype_nerdtree
+    au!
+    au FileType nerdtree call s:disable_lightline_on_nerdtree()
+    au WinEnter,BufWinEnter,TabEnter * call s:disable_lightline_on_nerdtree()
+    augroup END
+
+    fu s:disable_lightline_on_nerdtree() abort
+    let nerdtree_winnr = index(map(range(1, winnr('$')), {_,v -> getbufvar(winbufnr(v), '&ft')}), 'nerdtree') + 1
+	call timer_start(0, {-> nerdtree_winnr && setwinvar(nerdtree_winnr, '&stl', '%#Normal#')})
+    endfu
 
