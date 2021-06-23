@@ -1,4 +1,4 @@
-syntax on 
+syntax on
 filetype on
 
 set number
@@ -36,12 +36,21 @@ tnoremap jj <C-\><C-n>
 
 map <C-n> :NERDTreeToggle<CR>
 
-autocmd vimenter * NERDTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
 let g:lightline = {
       \ 'colorscheme': 'nord',
       \ }
+
+let g:dashboard_default_executive ='fzf'
+
+let g:dashboard_custom_shortcut={
+\ 'last_session'       : 'SPC s l',
+\ 'find_history'       : 'SPC f h',
+\ 'find_file'          : 'SPC f f',
+\ 'new_file'           : 'SPC c n',
+\ 'change_colorscheme' : 'SPC t c',
+\ 'find_word'          : 'SPC f a',
+\ 'book_marks'         : 'SPC f b',
+\ }
 
 let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
 let s:palette.normal.middle = [ [ 'NONE', 'NONE', 'NONE', 'NONE' ] ]
@@ -73,6 +82,5 @@ augroup filetype_nerdtree
 
     fu s:disable_lightline_on_nerdtree() abort
     let nerdtree_winnr = index(map(range(1, winnr('$')), {_,v -> getbufvar(winbufnr(v), '&ft')}), 'nerdtree') + 1
-	call timer_start(0, {-> nerdtree_winnr && setwinvar(nerdtree_winnr, '&stl', '%#Normal#')})
+        call timer_start(0, {-> nerdtree_winnr && setwinvar(nerdtree_winnr, '&stl', '%#Normal#')})
     endfu
-
